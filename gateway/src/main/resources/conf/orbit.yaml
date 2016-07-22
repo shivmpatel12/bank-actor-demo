@@ -1,0 +1,15 @@
+# Copyright (C) 2016 Electronic Arts Inc.  All rights reserved.
+
+# Actor Framework Config
+orbit.actors.clusterName: "orbit-skunkworks-cluster"
+orbit.actors.nodeName: "orbit-skunkworks-gateway"
+orbit.actors.stageMode: CLIENT
+
+# Jetty / Web Config
+orbit.jetty.port: 8080
+
+# Class Discovery
+orbit.container.classes:
+  - com.ea.eadpm.skunkworks.GatewayBootstrap
+orbit.container.packages:
+  - com.ea.eadpm.skunkworks.handler

@@ -1,0 +1,16 @@
+graph {
+    fill-color: white;
+}
+
+node {
+    size: 20px;
+    shape: circle;
+
+    text-style: bold;
+
+}
+
+edge {
+    arrow-shape: arrow;
+    arrow-size: 50px;
+}

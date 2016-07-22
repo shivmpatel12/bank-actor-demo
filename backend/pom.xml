@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2016 Electronic Arts Inc.  All rights reserved.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.ea.eadpm</groupId>
+        <artifactId>orbit-skunkworks-parent</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+    <artifactId>orbit-skunkworks-backend</artifactId>
+    <name>EADPM Orbit Skunkworks: Backend</name>
+
+    <properties>
+        <orbit.hk2.version>0.8.1</orbit.hk2.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.ea.eadpm</groupId>
+            <artifactId>orbit-skunkworks-interfaces</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cloud.orbit</groupId>
+            <artifactId>orbit-runtime</artifactId>
+            <version>${orbit.framework.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cloud.orbit</groupId>
+            <artifactId>orbit-json</artifactId>
+            <version>${orbit.framework.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cloud.orbit</groupId>
+            <artifactId>orbit-hk2</artifactId>
+            <version>${orbit.hk2.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.21</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cloud.orbit</groupId>
+            <artifactId>orbit-actor-tests</artifactId>
+            <version>${orbit.framework.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.ea.eadpm.skunkworks.BackendBootstrap</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

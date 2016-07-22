@@ -1,0 +1,395 @@
+<!doctype html>
+<html>
+<head>
+    <title>Network | DataSet</title>
+
+    <style type="text/css">
+        html, body {
+            font: 11pt arial;
+        }
+
+        h1 {
+            font-size: 150%;
+            margin: 5px 0;
+        }
+
+        h2 {
+            font-size: 100%;
+            margin: 5px 0;
+        }
+
+        table.view {
+            width: 100%;
+        }
+
+        table td {
+            vertical-align: top;
+        }
+
+        table table {
+            background-color: #f5f5f5;
+            border: 1px solid #e5e5e5;
+        }
+
+        table table td {
+            vertical-align: middle;
+        }
+
+        input[type=text], pre {
+            border: 1px solid lightgray;
+        }
+
+        pre {
+            margin: 0;
+            padding: 5px;
+            font-size: 10pt;
+        }
+
+        #nodes {
+            overflow: auto;
+            width: 90%;
+            height: 600px;
+            border: 1px solid lightgray;
+        }
+
+        #network {
+            width: 100%;
+            height: 600px;
+            border: 1px solid lightgray;
+        }
+    </style>
+
+    <script type="text/javascript" src="vis/dist/vis.js"></script>
+    <link href="vis/dist/vis.css" rel="stylesheet" type="text/css"/>
+
+    <script type="text/javascript">
+        var nodes, edges, network;
+
+        var count = +1;
+
+        // convenience method to stringify a JSON object
+        function toJSON(obj) {
+            return JSON.stringify(obj, null, 4);
+        }
+
+        function addNode() {
+            try {
+                var sUser = '{"username": "' + document.getElementById('node-id').value + '",' +
+                        '"balance": "' + document.getElementById('balance').value + '"}';
+                var url = baseURL + "users";
+                xmlhttp.open("POST", url, true);
+                xmlhttp.setRequestHeader("Content-type", "application/json");
+                xmlhttp.onreadystatechange = function () {
+                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                        nodes.add({
+                            id: document.getElementById('node-id').value,
+                            label: document.getElementById('node-id').value,
+                            balance: +document.getElementById('balance').value
+                        });
+                    }
+                }
+                xmlhttp.send(sUser);
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+
+        function updateNode() {
+            try {
+                nodes.update({
+                    id: document.getElementById('node-id').value,
+                    label: document.getElementById('node-label').value
+                });
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+        function removeNode() {
+            try {
+                nodes.remove({id: document.getElementById('node-id').value});
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+
+
+
+        function draw() {
+            // create an array with nodes
+            nodes = new vis.DataSet();
+            nodes.on('*', function () {
+                document.getElementById('nodes').innerHTML = JSON.stringify(nodes.get(), null, 4);
+            });
+
+
+            // create an array with edges
+            edges = new vis.DataSet();
+
+
+
+            // create a network
+            var container = document.getElementById('network');
+            var data = {
+                nodes: nodes,
+                edges: edges
+            };
+            var options = {};
+            network = new vis.Network(container, data, options);
+
+        }
+
+        xmlhttp = new XMLHttpRequest();
+
+        var baseURL = document.location.href.substr(0, document.location.href.lastIndexOf("/") + 1);
+
+        function performTrade() {
+            var sUser = '{"username1": "'+ document.getElementById("userA").value +'",' +
+                    ' "username2" : "'+ document.getElementById("userB").value +'",' +
+                    '"requestTypeForUser1": "currency",' +
+                    '"dataForUser1": "' + document.getElementById("amountFromA").value + '",' +
+                    '"requestTypeForUser2": "currency",' +
+                    '"dataForUser2" : "' + document.getElementById("amountFromB").value + '"}';
+            var url = baseURL + "trades";
+            var amountFromA = +document.getElementById("amountFromA").value;
+            var amountFromB = +document.getElementById("amountFromB").value;
+            var balanceForA = +nodes.get(document.getElementById('userA').value).balance;
+            var balanceForB = +nodes.get(document.getElementById('userB').value).balance;
+            xmlhttp.open("POST", url, true);
+            xmlhttp.setRequestHeader("Content-type", "application/json");
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    balanceForA = +balanceForA - +amountFromA + +amountFromB;
+                    balanceForB = +balanceForB - +amountFromB + +amountFromA;
+                    nodes.update([{
+                        id: document.getElementById('userA').value,
+                        balance: balanceForA},
+                        {
+                            id: document.getElementById('userB').value,
+                            balance: balanceForB
+                        }]);
+                    var tradeId = "trade" + count;
+                    count = count + +1;
+                    nodes.add({
+                        id: tradeId,
+                        label: "Trade Actor",
+                        color: '#66FFB2'
+                    });
+                    setTimeout(function () {
+                        edges.add([
+                            {id: '1',
+                                label: 'amount: ' + document.getElementById("amountFromA").value,
+                                from: document.getElementById("userA").value,
+                                to: tradeId,
+                                arrows: 'to'},
+                            {id: '2',
+                                label: 'amount: ' + document.getElementById("amountFromB").value,
+                                from: document.getElementById("userB").value,
+                                to: tradeId,
+                                arrows: 'to'}
+                        ]);
+                    }, 1000);
+                    setTimeout(function () {
+                        edges.remove([{id: '1'}, {id: '2'}]);
+                        edges.add([
+                            {label: 'amount: ' + document.getElementById("amountFromB").value,
+                                from: tradeId,
+                                to: document.getElementById("userA").value,
+                                arrows: 'to'},
+                            {label: 'amount: ' + document.getElementById("amountFromA").value,
+                                from: tradeId,
+                                to: document.getElementById("userB").value,
+                                arrows: 'to'}
+                        ]);
+                    }, 2000);
+                    setTimeout(function () {
+                        nodes.remove({id: tradeId});
+                    }, 3000);
+                }
+            }
+            xmlhttp.send(sUser);
+        }
+
+        function withdraw() {
+            var url = baseURL + "users/" + document.getElementById("transactionId").value + "/transactions";
+            var json = '{"username": "' + document.getElementById("transactionId").value + '",' +
+                    '"amount": "' + document.getElementById("amount").value + '",' +
+                    '"transactionType": "withdraw"}';
+            xmlhttp.open("POST", url, true);
+            xmlhttp.setRequestHeader("Content-type", "application/json");
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    try {
+                        var balance = nodes.get(document.getElementById('transactionId').value).balance;
+                        balance = +balance - +document.getElementById("amount").value;
+                        nodes.update({
+                            id: document.getElementById('transactionId').value,
+                            balance: balance
+                        });
+                    }
+                    catch (err) {
+                        alert(err);
+                    }                }
+            }
+            xmlhttp.send(json);
+        }
+
+        function deposit() {
+            var url = baseURL + "users/" + document.getElementById("transactionId").value + "/transactions";
+            var json = '{"username": "' + document.getElementById("transactionId").value + '",' +
+                    '"amount": "' + document.getElementById("amount").value + '",' +
+                    '"transactionType": "deposit"}';
+            xmlhttp.open("POST", url, true);
+            xmlhttp.setRequestHeader("Content-type", "application/json");
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    try {
+                        var balance = nodes.get(document.getElementById('transactionId').value).balance;
+                        balance = +balance + +document.getElementById("amount").value;
+                        nodes.update({
+                            id: document.getElementById('transactionId').value,
+                            balance: balance
+                        });
+                    }
+                    catch (err) {
+                        alert(err);
+                    }                }
+            }
+            xmlhttp.send(json);
+        }
+
+        function deleteUser() {
+            try {
+                var url = baseURL + "users/" + document.getElementById('node-id').value;
+                xmlhttp.open("DELETE", url, true);
+                xmlhttp.setRequestHeader("Content-type", "application/json");
+                xmlhttp.onreadystatechange = function () {
+                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                        nodes.remove({id: document.getElementById('node-id').value});
+                    }
+                }
+                xmlhttp.send("");
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+
+
+    </script>
+</head>
+
+<body onload="draw();">
+
+<h1>Bank Actor Demo</h1>
+<table>
+    <tr>
+        <td>
+            <h2>Create User</h2>
+            <table>
+                <tr>
+                    <td></td>
+                    <td><label for="node-id">Id</label></td>
+                    <td><input id="node-id" type="text"></td>
+                </tr>
+
+                <tr>
+                    <td></td>
+                    <td><label for="balance">Balance</label></td>
+                    <td><input id="balance" type="number"></td>
+                </tr>
+
+                <tr>
+                    <td></td>
+                    <td>Action</td>
+                    <td>
+                        <button id="node-add" onclick="addNode();">Create</button>
+                        <button id="node-remove" onclick="deleteUser();">Delete</button>
+                    </td>
+                </tr>
+            </table>
+        </td>
+
+        <td>
+            <h2>Make Transaction</h2>
+            <table>
+                <tr>
+                    <td></td>
+                    <td><label for="transactionId">Id</label></td>
+                    <td><input id="transactionId" type="text"></td>
+                </tr>
+
+                <tr>
+                    <td></td>
+                    <td><label for="amount">Amount</label></td>
+                    <td><input id="amount" type="number"></td>
+                </tr>
+
+                <tr>
+                    <td></td>
+                    <td>Action</td>
+                    <td>
+                        <button id="withdraw" onclick="withdraw();">Withdraw</button>
+                        <button id="deposit" onclick="deposit();">Deposit</button>
+                    </td>
+                </tr>
+            </table>
+        </td>
+
+        <td>
+            <h2>Trade</h2>
+            <table>
+                <tr>
+                    <td></td>
+                    <td><label for="userA">User A</label></td>
+                    <td><input id="userA" type="text"></td>
+                    <td><label for="amountFromA">Amount User A Will Give</label></td>
+                    <td><input id="amountFromA" type="number"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><label for="userB">User B</label></td>
+                    <td><input id="userB" type="text"></td>
+                    <td><label for="amountFromB">Amount User B Will Give</label></td>
+                    <td><input id="amountFromB" type="number"></td>
+                </tr>
+
+                <tr>
+                    <td></td>
+                    <td>
+                        <button id="edge-add" onclick="performTrade();">Make Trade</button>
+                    </td>
+                </tr>
+            </table>
+        </td>
+
+    </tr>
+
+</table>
+
+<table class="view">
+    <colgroup>
+        <col width="25%">
+        <col width="75%">
+    </colgroup>
+    <tr>
+        <td>
+            <h2>Actors</h2>
+            <div>
+                <pre id="nodes"></pre>
+            </div>
+        </td>
+
+
+        <td>
+            <h2>Actor Graph</h2>
+
+            <div id="network"></div>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

@@ -1,5 +1,5 @@
-Orbit Skunkworks
-=======
+Bank Actor Demo
+===============
 
 Orbit Skunkworks is an example project based on the idea of a guestbook, designed to help developers understand how to use the orbit framework to build REST based online services and for them to experiment freely without complex project setup.
 

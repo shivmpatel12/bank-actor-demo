@@ -1,10 +1,12 @@
 package com.ea.eadpm.skunkworks;
 
+import cloud.orbit.actors.Actor;
 import com.ea.eadpm.skunkworks.dto.UserDto;
 
 import cloud.orbit.actors.runtime.AbstractActor;
 import cloud.orbit.concurrent.Task;
 
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -15,6 +17,18 @@ public class UsersActor extends AbstractActor implements Users {
     @Override
     public Task<Map<String, UserDto>> getUsers()
     {
-        return Task.fromValue(UserActors.getUserActors());
+        return Task.fromValue(UserActorList.getUserActors());
+    }
+
+    @Override
+    public Task deleteUsers() {
+        Iterator<String> iterator = UserActorList.getUserActors().keySet().iterator();
+        while (iterator.hasNext()) {
+            String username = iterator.next();
+            User user = Actor.getReference(User.class, username);
+            user.deleteUser();
+        }
+        UserActorList.clearUsers();
+        return Task.done();
     }
 }

@@ -6,12 +6,9 @@ import cloud.orbit.concurrent.Task;
 import com.ea.eadpm.skunkworks.dto.TransactionDto;
 import com.ea.eadpm.skunkworks.dto.UserDto;
 
-import org.graphstream.graph.Node;
-
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static com.ea.async.Async.await;
 
@@ -36,22 +33,9 @@ public class UserActor extends AbstractActor<UserActor.State> implements User {
         userDto.setTransactionsForUser(new ArrayList<>());
         userDto.setItems(new ArrayList<>());
 
-//        Node node = ActorGraph.getGraph().addNode(username);
-//        node.addAttribute("ui.label", username);
-//        node.addAttribute("ui.style", "fill-color: rgb(" + randInt(0, 255) + "," +
-//                randInt(0, 255) + "," + randInt(0, 255) + ");");
-
         state().userDto = userDto;
         await(writeState());
-        UserActors.getUserActors().put(username, userDto);
-
-//        try
-//        {
-//            TimeUnit.SECONDS.sleep(3);
-//        } catch (Exception e) {
-//            System.out.println("waiting exception");
-//        }
-//        deactivateAsync();
+        UserActorList.getUserActors().put(username, userDto);
 
         return Task.fromValue(state().userDto);
     }
@@ -64,15 +48,7 @@ public class UserActor extends AbstractActor<UserActor.State> implements User {
 
     @Override
     public Task<UserDto> getUser() {
-//        activateAsync();
         final UserDto userDto = state().userDto;
-//        try
-//        {
-//            TimeUnit.SECONDS.sleep(3);
-//        } catch (Exception e) {
-//            System.out.println("waiting exception");
-//        }
-//        deactivateAsync();
         return Task.fromValue(userDto);
     }
 
@@ -81,7 +57,6 @@ public class UserActor extends AbstractActor<UserActor.State> implements User {
     {
         if (state().userDto != null) {
             System.out.println("activated");
-//            ActorGraph.getGraph().getNode(state().userDto.getUsername()).removeAttribute("ui.hide");
         }
         return super.activateAsync();
     }
@@ -91,7 +66,6 @@ public class UserActor extends AbstractActor<UserActor.State> implements User {
     {
         if (state().userDto != null) {
             System.out.println("deactivated");
-//            ActorGraph.getGraph().getNode(state().userDto.getUsername()).addAttribute("ui.hide");
         }
         return super.deactivateAsync();
     }
@@ -105,14 +79,14 @@ public class UserActor extends AbstractActor<UserActor.State> implements User {
             items.add(item);
             userDto.setItems(items);
             await(writeState());
-            UserActors.getUserActors().put(userDto.getUsername(), userDto);
+            UserActorList.getUserActors().put(userDto.getUsername(), userDto);
             return Task.fromValue(item);
         } else if (command.equals("take")) {
             if (item.contains(item)) {
                 items.remove(item);
                 userDto.setItems(items);
                 await(writeState());
-                UserActors.getUserActors().put(userDto.getUsername(), userDto);
+                UserActorList.getUserActors().put(userDto.getUsername(), userDto);
                 return Task.fromValue(item);
             } else {
                 throw new IllegalArgumentException("user does not have that item");
@@ -124,7 +98,7 @@ public class UserActor extends AbstractActor<UserActor.State> implements User {
     }
 
     @Override
-    public Task<TransactionDto> makeTransaction(final String transactionType, final double amount)
+    public Task<UserDto> makeTransaction(final String transactionType, final double amount)
     {
         final UserDto userDto = state().userDto;
         List<TransactionDto> transactions = userDto.getTransactionsForUser();
@@ -136,16 +110,16 @@ public class UserActor extends AbstractActor<UserActor.State> implements User {
             transactions.add(transactionDto);
             userDto.setTransactionsForUser(transactions);
             await(writeState());
-            UserActors.getUserActors().put(userDto.getUsername(), userDto);
-            return Task.fromValue(transactionDto);
+            UserActorList.getUserActors().put(userDto.getUsername(), userDto);
+            return Task.fromValue(userDto);
         } else if (transactionType.equals("withdraw")) {
             if (userDto.getBalance() >=  amount) {
                 userDto.setBalance(userDto.getBalance() - amount);
                 transactions.add(transactionDto);
                 userDto.setTransactionsForUser(transactions);
                 await(writeState());
-                UserActors.getUserActors().put(userDto.getUsername(), userDto);
-                return Task.fromValue(transactionDto);
+                UserActorList.getUserActors().put(userDto.getUsername(), userDto);
+                return Task.fromValue(userDto);
             } else {
                 throw new IllegalArgumentException("user has insufficient funds");
             }
@@ -158,7 +132,7 @@ public class UserActor extends AbstractActor<UserActor.State> implements User {
     {
         final UserDto userDto = state().userDto;
         clearState();
-        UserActors.getUserActors().remove(userDto.getUsername());
+        UserActorList.getUserActors().remove(userDto.getUsername());
         return Task.fromValue(userDto);
     }
 

@@ -15,4 +15,6 @@ public interface Users extends Actor {
 
     Task<Map<String, UserDto>> getUsers();
 
+    Task deleteUsers();
+
 }

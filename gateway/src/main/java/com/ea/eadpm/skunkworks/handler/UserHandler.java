@@ -33,6 +33,13 @@ public class UserHandler {
         return users.getUsers();
     }
 
+    @DELETE
+    @Path("/purge")
+    public Task deleteUsers() {
+        final Users users = Actor.getReference(Users.class, "UserActorRetriever");
+        return users.deleteUsers();
+    }
+
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -80,7 +87,7 @@ public class UserHandler {
     @POST
     @Path("/{username}/transactions")
     @Produces(MediaType.APPLICATION_JSON)
-    public Task<TransactionDto> makeTransaction(@PathParam("username") final String username, AddTransactionDto transactionDto) {
+    public Task<UserDto> makeTransaction(@PathParam("username") final String username, AddTransactionDto transactionDto) {
         final User user = Actor.getReference(User.class, username);
         if (await(user.exists())) {
             return user.makeTransaction(transactionDto.getTransactionType(), transactionDto.getAmount());

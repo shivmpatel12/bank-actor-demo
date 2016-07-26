@@ -3,7 +3,6 @@ package com.ea.eadpm.skunkworks;
 import cloud.orbit.actors.Actor;
 import cloud.orbit.concurrent.Task;
 
-import com.ea.eadpm.skunkworks.dto.TransactionDto;
 import com.ea.eadpm.skunkworks.dto.UserDto;
 
 
@@ -22,6 +21,6 @@ public interface User extends Actor {
 
     Task<String> giveOrTakeItem(String item, String command);
 
-    Task<TransactionDto> makeTransaction(String transactionType, double amount);
+    Task<UserDto> makeTransaction(String transactionType, double amount);
 
 }

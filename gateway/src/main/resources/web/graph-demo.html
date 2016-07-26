@@ -72,22 +72,30 @@
 
         function addNode() {
             try {
-                var sUser = '{"username": "' + document.getElementById('node-id').value + '",' +
-                        '"balance": "' + document.getElementById('balance').value + '"}';
                 var url = baseURL + "users";
-                xmlhttp.open("POST", url, true);
-                xmlhttp.setRequestHeader("Content-type", "application/json");
-                xmlhttp.onreadystatechange = function () {
-                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                        var user = JSON.parse(xmlhttp.response.toString());
-                        nodes.add({
-                            id: document.getElementById('node-id').value,
-                            label: document.getElementById('node-id').value + "\n$" + +user.balance,
-                            balance: +user.balance
-                        });
+                if (nodes.length < 50) {
+                    console.log(nodes.length);
+                    var sUser = '{"username": "' + document.getElementById('node-id').value + '",' +
+                            '"balance": "' + document.getElementById('balance').value + '"}';
+                    xmlhttp.open("POST", url, true);
+                    xmlhttp.setRequestHeader("Content-type", "application/json");
+                    xmlhttp.onreadystatechange = function () {
+                        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                            var user = JSON.parse(xmlhttp.response.toString());
+                            nodes.add({
+                                id: document.getElementById('node-id').value,
+                                label: document.getElementById('node-id').value + "\n$" + +user.balance,
+                                balance: +user.balance
+                            });
+                        }
                     }
+                    xmlhttp.send(sUser);
+                } else {
+                    xmlhttp.open("DELETE", url + "/purge", true);
+                    xmlhttp.send("");
+                    alert("User count has exceeded 50; users have been purged");
+                    window.location.reload();
                 }
-                xmlhttp.send(sUser);
             }
             catch (err) {
                 alert(err);
@@ -318,7 +326,7 @@
                     <td></td>
                     <td>Action</td>
                     <td>
-                        <button id="node-add" onclick="addNode();">Create</button>
+                        <button id="node-add" onclick="addNode();">Create*</button>
                         <button id="node-remove" onclick="deleteUser();">Delete</button>
                     </td>
                 </tr>
@@ -403,6 +411,10 @@
         </td>
     </tr>
 </table>
+
+<tr>
+    * Will delete all users if count exceeds 50
+</tr>
 
 </body>
 </html>

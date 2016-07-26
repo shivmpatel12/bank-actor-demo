@@ -22,13 +22,14 @@ public class UsersActor extends AbstractActor implements Users {
 
     @Override
     public Task deleteUsers() {
-        Iterator<String> iterator = UserActorList.getUserActors().keySet().iterator();
-        while (iterator.hasNext()) {
-            String username = iterator.next();
-            User user = Actor.getReference(User.class, username);
-            user.deleteUser();
+
+        Object[] userArray = UserActorList.getUserActors().keySet().toArray();
+        for (Object s: userArray) {
+            Actor.getReference(User.class, s.toString()).deleteUser().join();
         }
+
         UserActorList.clearUsers();
+
         return Task.done();
     }
 }

@@ -65,6 +65,10 @@
     <script type="text/javascript">
         var nodes, edges, network;
 
+        var play = true;
+
+        var userArray = [];
+
         // convenience method to stringify a JSON object
         function toJSON(obj) {
             return JSON.stringify(obj, null, 4);
@@ -82,6 +86,7 @@
                     xmlhttp.onreadystatechange = function () {
                         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                             var user = JSON.parse(xmlhttp.response.toString());
+                            userArray.push(document.getElementById('node-id').value);
                             nodes.add({
                                 id: document.getElementById('node-id').value,
                                 label: document.getElementById('node-id').value + "\n$" + +user.balance,
@@ -144,6 +149,7 @@
                                 label: userObject.username + "\n$" + +userObject.balance,
                                 balance: +userObject.balance
                             });
+                            userArray.push(userObject.username);
                         }
                     }
                 }
@@ -158,7 +164,7 @@
 
         var baseURL = document.location.href.substr(0, document.location.href.lastIndexOf("/") + 1);
 
-        function performTrade() {
+        function makeTrade() {
             var sUser = '{"username1": "'+ document.getElementById("userA").value +'",' +
                     ' "username2" : "'+ document.getElementById("userB").value +'",' +
                     '"requestTypeForUser1": "currency",' +
@@ -188,14 +194,16 @@
                         label: "Trade Actor",
                         color: '#66FFB2'
                     });
+                    var edge1 = createGuid();
+                    var edge2 = createGuid();
                     setTimeout(function () {
                         edges.add([
-                            {id: '1',
+                            {id: edge1,
                                 label: 'amount: ' + document.getElementById("amountFromA").value,
                                 from: document.getElementById("userA").value,
                                 to: tradeId,
                                 arrows: 'to'},
-                            {id: '2',
+                            {id: edge2,
                                 label: 'amount: ' + document.getElementById("amountFromB").value,
                                 from: document.getElementById("userB").value,
                                 to: tradeId,
@@ -203,7 +211,7 @@
                         ]);
                     }, 1000);
                     setTimeout(function () {
-                        edges.remove([{id: '1'}, {id: '2'}]);
+                        edges.remove([{id: edge1}, {id: edge2}]);
                         edges.add([
                             {label: 'amount: ' + document.getElementById("amountFromB").value,
                                 from: tradeId,
@@ -298,6 +306,105 @@
             });
         }
 
+        function performTrade(username1, amountFromUser1, username2, amountFromUser2) {
+            var sUser = '{"username1": "'+ username1 +'",' +
+                    ' "username2" : "'+ username2 +'",' +
+                    '"requestTypeForUser1": "currency",' +
+                    '"dataForUser1": "' + amountFromUser1 + '",' +
+                    '"requestTypeForUser2": "currency",' +
+                    '"dataForUser2" : "' + amountFromUser2 + '"}';
+            var url = baseURL + "trades";
+            xmlhttp.open("POST", url, true);
+            xmlhttp.setRequestHeader("Content-type", "application/json");
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    var users = JSON.parse(xmlhttp.response.toString());
+                    var userA = users[username1];
+                    var userB = users[username2];
+                    nodes.update([{
+                        id: username1,
+                        label: username1 + "\n$" + +userA.balance,
+                        balance: +userA.balance},
+                        {
+                            id: username2,
+                            label: username2 + "\n$" + +userB.balance,
+                            balance: +userB.balance
+                        }]);
+                    var tradeId = "trade" + createGuid();
+                    nodes.add({
+                        id: tradeId,
+                        label: "Trade Actor",
+                        color: '#66FFB2'
+                    });
+                    var edge1 = createGuid();
+                    var edge2 = createGuid();
+                    setTimeout(function () {
+                        edges.add([
+                            {id: edge1,
+                                label: 'amount: ' + amountFromUser1,
+                                from: username1,
+                                to: tradeId,
+                                arrows: 'to'},
+                            {id: edge2,
+                                label: 'amount: ' + amountFromUser2,
+                                from: username2,
+                                to: tradeId,
+                                arrows: 'to'}
+                        ]);
+                    }, 1000);
+                    setTimeout(function () {
+                        edges.remove([{id: edge1}, {id: edge2}]);
+                        edges.add([
+                            {label: 'amount: ' + amountFromUser2,
+                                from: tradeId,
+                                to: username1,
+                                arrows: 'to'},
+                            {label: 'amount: ' + amountFromUser1,
+                                from: tradeId,
+                                to: username2,
+                                arrows: 'to'}
+                        ]);
+                    }, 2000);
+                    setTimeout(function () {
+                        nodes.remove({id: tradeId});
+                    }, 3000);
+                }
+            }
+            xmlhttp.send(sUser);
+        }
+
+
+    var tid;
+
+    function generate() {
+
+
+        var indA;
+        var indB;
+
+        var userA;
+        var userB;
+
+        console.log("length: " + userArray.length);
+        indA = Math.floor((Math.random() * +userArray.length));
+        indB = Math.floor((Math.random() * +userArray.length));
+
+        console.log("indA: " + indA);
+        userA = userArray[+indA];
+        userB = userArray[+indB];
+        console.log("userA: " + userA);
+
+
+        performTrade(userA, 20, userB, 10);
+
+        tid = setTimeout(generate, 50);
+
+    }
+
+    function abortTimer() {
+        clearInterval(tid);
+    }
+
 
     </script>
 </head>
@@ -326,7 +433,7 @@
                     <td></td>
                     <td>Action</td>
                     <td>
-                        <button id="node-add" onclick="addNode();">Create*</button>
+                        <button id="node-add" onclick="addNode();">Create</button>
                         <button id="node-remove" onclick="deleteUser();">Delete</button>
                     </td>
                 </tr>
@@ -380,7 +487,21 @@
                 <tr>
                     <td></td>
                     <td>
-                        <button id="edge-add" onclick="performTrade();">Trade</button>
+                        <button id="edge-add" onclick="makeTrade();">Trade</button>
+                    </td>
+                </tr>
+            </table>
+        </td>
+
+        <td>
+            <h2>Generate</h2>
+            <table>
+                <tr>
+                    <td></td>
+                    <td>Action</td>
+                    <td>
+                        <button id="play" onclick="generate();">Play</button>
+                        <button id="pause" onclick="abortTimer();">Pause</button>
                     </td>
                 </tr>
             </table>
@@ -397,7 +518,7 @@
     </colgroup>
     <tr>
         <td>
-            <h2>Actors</h2>
+            <h2>Actors*</h2>
             <div>
                 <pre id="nodes"></pre>
             </div>

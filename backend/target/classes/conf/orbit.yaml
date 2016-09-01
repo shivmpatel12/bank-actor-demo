@@ -1,0 +1,15 @@
+# Copyright (C) 2016 Electronic Arts Inc.  All rights reserved.
+
+# Actor Framework Config
+orbit.actors.clusterName: "orbit-skunkworks-cluster"
+orbit.actors.nodeName: "orbit-skunkworks-backend"
+orbit.actors.stageMode: HOST
+
+# Class Discovery
+orbit.container.classes:
+  - com.ea.eadpm.skunkworks.BackendBootstrap
+
+# Storage
+orbit.actors.extensions: [
+  !!cloud.orbit.actors.extensions.json.InMemoryJSONStorageExtension {}
+]

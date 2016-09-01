@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/backend/orbit-skunkworks-backend.iml" filepath="$PROJECT_DIR$/backend/orbit-skunkworks-backend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gateway/orbit-skunkworks-gateway.iml" filepath="$PROJECT_DIR$/gateway/orbit-skunkworks-gateway.iml" />
+      <module fileurl="file://$PROJECT_DIR$/interfaces/orbit-skunkworks-interfaces.iml" filepath="$PROJECT_DIR$/interfaces/orbit-skunkworks-interfaces.iml" />
+      <module fileurl="file://$PROJECT_DIR$/orbit-skunkworks-parent.iml" filepath="$PROJECT_DIR$/orbit-skunkworks-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/single-launcher/orbit-skunkworks-single-launcher.iml" filepath="$PROJECT_DIR$/single-launcher/orbit-skunkworks-single-launcher.iml" />
+    </modules>
+  </component>
+</project>

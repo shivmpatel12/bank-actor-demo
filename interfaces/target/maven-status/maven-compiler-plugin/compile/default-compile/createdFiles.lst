@@ -1,0 +1,12 @@
+META-INF\services\orbit\classId\8\0\342492908.name
+META-INF\services\orbit\classId\2\1\343450512.name
+com\ea\eadpm\skunkworks\dto\TradeDto.class
+com\ea\eadpm\skunkworks\dto\TransactionDto.class
+com\ea\eadpm\skunkworks\User.class
+META-INF\services\orbit\classes\com.ea.eadpm.skunkworks.User.yml
+META-INF\services\orbit\classes\com.ea.eadpm.skunkworks.Users.yml
+META-INF\services\orbit\classes\com.ea.eadpm.skunkworks.Trade.yml
+com\ea\eadpm\skunkworks\Trade.class
+com\ea\eadpm\skunkworks\dto\UserDto.class
+com\ea\eadpm\skunkworks\Users.class
+META-INF\services\orbit\classId\7\2\2089289027.name

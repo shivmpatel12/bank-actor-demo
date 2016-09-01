@@ -1,0 +1,13 @@
+META-INF\services\orbit\classes\com.ea.eadpm.skunkworks.TradeActor.yml
+META-INF\services\orbit\classId\2\4\382371442.name
+com\ea\eadpm\skunkworks\UserActor$State.class
+com\ea\eadpm\skunkworks\UserActor.class
+com\ea\eadpm\skunkworks\TradeActor.class
+com\ea\eadpm\skunkworks\BackendBootstrap.class
+META-INF\services\orbit\classId\7\0\m245094807.name
+com\ea\eadpm\skunkworks\TradeActor$State.class
+META-INF\services\orbit\classes\com.ea.eadpm.skunkworks.UserActor.yml
+com\ea\eadpm\skunkworks\UsersActor.class
+META-INF\services\orbit\classes\com.ea.eadpm.skunkworks.UsersActor.yml
+com\ea\eadpm\skunkworks\UserActorList.class
+META-INF\services\orbit\classId\9\2\368169029.name

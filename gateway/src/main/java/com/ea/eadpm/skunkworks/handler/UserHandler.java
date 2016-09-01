@@ -8,7 +8,6 @@ import com.ea.eadpm.skunkworks.Users;
 import com.ea.eadpm.skunkworks.dto.AddItemDto;
 import com.ea.eadpm.skunkworks.dto.AddTransactionDto;
 import com.ea.eadpm.skunkworks.dto.AddUserDto;
-import com.ea.eadpm.skunkworks.dto.TransactionDto;
 import com.ea.eadpm.skunkworks.dto.UserDto;
 
 import javax.ws.rs.*;
